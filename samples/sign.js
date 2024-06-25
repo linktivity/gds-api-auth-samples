@@ -1,3 +1,4 @@
+const cryptoJS = require("crypto-js")
 const GetSignature = ({apiKey,host,path,salt1,salt2}) => {
     if (typeof window != 'undefined') {
         throw new Error("cannot be used by browser env")
@@ -14,7 +15,7 @@ const GetSignature = ({apiKey,host,path,salt1,salt2}) => {
     ts = `${year}${month}${day}T${hours}${minutes}${seconds}Z`
 
     function sign(key, msg) {
-        const hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, key);
+        const hmac = cryptoJS.algo.HMAC.create(cryptoJS.algo.SHA256, key);
         hmac.update(msg);
         return hmac.finalize();
     }
@@ -24,10 +25,9 @@ const GetSignature = ({apiKey,host,path,salt1,salt2}) => {
     k3 = sign(k2, path);
     k = sign(k3, salt2);
 
-    return CryptoJS.enc.Base64.stringify(k).replace(/\+/g, '-').replace(/\//g, '_');
+    return cryptoJS.enc.Base64.stringify(k).replace(/\+/g, '-').replace(/\//g, '_');
 }
 
-// for postman pre-request script
 encodedKeys = GetSignature({
     apiKey:pm.environment.get("api-key"),
     host:pm.request.url.getHost(),
